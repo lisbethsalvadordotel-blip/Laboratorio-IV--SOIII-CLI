@@ -1,0 +1,126 @@
+Comandos utilizados, práctica laboratorio 4.2:
+Administración de Servicios de Red (Parte 2)
+
+Servidor de correo SMTP (Postfix)
+
+============================================
+
+# INSTALAR POSTFIX
+
+sudo dnf install postfix -y
+
+------------------------------------------------------------
+
+# INICIAR Y HABILITAR SERVICIO
+
+sudo systemctl start postfix
+sudo systemctl enable postfix
+sudo systemctl status postfix
+
+------------------------------------------------------------
+
+# ABRIR PUERTO SMTP EN FIREWALL
+
+sudo firewall-cmd --add-service=smtp --permanent
+sudo firewall-cmd --reload
+
+------------------------------------------------------------
+
+# CONFIGURAR POSTFIX PARA USAR GMAIL COMO RELAY
+
+sudo nano /etc/postfix/main.cf
+
+# AGREGAR O VERIFICAR:
+
+inet_interfaces = all
+mydestination = $myhostname, localhost.$mydomain, localhost
+
+relayhost = [smtp.gmail.com]:587
+smtp_sasl_auth_enable = yes
+smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd
+smtp_sasl_security_options = noanonymous
+smtp_use_tls = yes
+smtp_tls_security_level = encrypt
+
+------------------------------------------------------------
+
+# CREAR ARCHIVO DE CREDENCIALES
+
+sudo nano /etc/postfix/sasl_passwd
+
+# FORMATO:
+
+[smtp.gmail.com]:587 tu_correo@gmail.com:contraseña_de_aplicación
+
+------------------------------------------------------------
+
+# IMPORTANTE (GMAIL)
+
+# Debes usar CONTRASEÑA DE APLICACIÓN
+# Activar verificación en 2 pasos en tu cuenta Google
+
+------------------------------------------------------------
+
+# PROTEGER ARCHIVO
+
+sudo chmod 600 /etc/postfix/sasl_passwd
+
+------------------------------------------------------------
+
+# GENERAR HASH
+
+sudo postmap /etc/postfix/sasl_passwd
+
+------------------------------------------------------------
+
+# REINICIAR POSTFIX
+
+sudo systemctl restart postfix
+
+------------------------------------------------------------
+
+# CREAR MENSAJE
+
+nano mensaje.txt
+
+# CONTENIDO:
+
+Tu Nombre Completo
+Matrícula: TU-MATRICULA
+
+------------------------------------------------------------
+
+# INSTALAR HERRAMIENTA MAIL (SI NO ESTÁ)
+
+sudo dnf install mailx -y
+
+------------------------------------------------------------
+
+# ENVIAR CORREO
+
+mail -s "MambruSeFueALaGuerra" os3conadrian@gmail.com < mensaje.txt
+
+------------------------------------------------------------
+
+# VERIFICACIÓN
+
+# Si no da error → enviado
+# Revisar bandeja del destinatario
+
+------------------------------------------------------------
+
+# ERRORES COMUNES
+
+# No envía correo:
+sudo systemctl status postfix
+
+# Error autenticación:
+verificar contraseña de aplicación
+
+# Puerto bloqueado:
+sudo firewall-cmd --list-all
+
+# Ver logs:
+sudo journalctl -xe
+
+------------------------------------------------------------
