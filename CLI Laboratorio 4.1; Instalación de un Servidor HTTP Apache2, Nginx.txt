@@ -1,0 +1,188 @@
+Comandos utilizados, práctica laboratorio 4.1:
+Administración de Servicios de Red (Parte 2)
+
+Servidor HTTP Apache (Virtual Hosts)
+
+============================================
+
+# INSTALAR APACHE
+
+sudo dnf install httpd -y
+
+# Iniciar y habilitar servicio
+
+sudo systemctl start httpd
+sudo systemctl enable httpd
+
+# Verificar estado
+
+sudo systemctl status httpd
+
+------------------------------------------------------------
+
+# PERMITIR HTTP EN FIREWALL (IMPORTANTE)
+
+sudo firewall-cmd --add-service=http --permanent
+sudo firewall-cmd --reload
+
+------------------------------------------------------------
+
+# CREAR PRIMER SITIO WEB (HOLA MUNDO)
+
+cd /var/www/html
+
+sudo mkdir Hola
+cd Hola
+
+sudo nano index.html
+
+# Contenido:
+
+<!DOCTYPE html>
+<html>
+<head><title>Hola Mundo</title></head>
+<body><h1>Hola Mundo</h1></body>
+</html>
+
+# Guardar: Ctrl + O → Enter → Ctrl + X
+
+------------------------------------------------------------
+
+# CONFIGURAR VIRTUAL HOST PUERTO 80
+
+sudo nano /etc/httpd/conf/httpd.conf
+
+# Verificar que exista:
+Listen 80
+
+# Agregar al final:
+
+<VirtualHost *:80>
+    ServerName hola.localhost
+    DocumentRoot "/var/www/html/Hola"
+</VirtualHost>
+
+# Guardar y salir
+
+------------------------------------------------------------
+
+# REINICIAR APACHE
+
+sudo systemctl restart httpd
+
+------------------------------------------------------------
+
+# AGREGAR HOST LOCAL
+
+sudo nano /etc/hosts
+
+# Agregar:
+127.0.0.1 hola.localhost
+
+------------------------------------------------------------
+
+# PROBAR
+
+# En navegador:
+http://hola.localhost
+
+# Debe mostrar: Hola Mundo
+
+------------------------------------------------------------
+
+# CREAR SEGUNDO SITIO WEB
+
+cd /var/www/html
+
+sudo mkdir estudiante
+cd estudiante
+
+sudo nano index.html
+
+# Contenido:
+
+<!DOCTYPE html>
+<html>
+<head><title>Estudiante</title></head>
+<body>
+<h2>Lis Salvador</h2>
+<p>Matrícula: TU-MATRICULA</p>
+<p>Materia: Sistemas Operativos III</p>
+</body>
+</html>
+
+------------------------------------------------------------
+
+# CONFIGURAR PUERTO 8080
+
+sudo nano /etc/httpd/conf/httpd.conf
+
+# Agregar:
+Listen 8080
+
+------------------------------------------------------------
+
+# CREAR VIRTUAL HOST PUERTO 8080
+
+<VirtualHost *:8080>
+    ServerName estudiante.localhost
+    DocumentRoot "/var/www/html/estudiante"
+</VirtualHost>
+
+------------------------------------------------------------
+
+# PERMITIR PUERTO 8080 EN FIREWALL
+
+sudo firewall-cmd --add-port=8080/tcp --permanent
+sudo firewall-cmd --reload
+
+------------------------------------------------------------
+
+# REINICIAR APACHE
+
+sudo systemctl restart httpd
+
+------------------------------------------------------------
+
+# AGREGAR SEGUNDO HOST
+
+sudo nano /etc/hosts
+
+# Agregar:
+127.0.0.1 estudiante.localhost
+
+------------------------------------------------------------
+
+# PROBAR
+
+# En navegador:
+http://estudiante.localhost:8080
+
+# Debe mostrar:
+# Nombre, matrícula y materia
+
+------------------------------------------------------------
+
+# VERIFICACIÓN FINAL
+
+# Ver si Apache está activo:
+sudo systemctl status httpd
+
+# Ver puertos abiertos:
+ss -tuln | grep httpd
+
+------------------------------------------------------------
+
+# ERRORES COMUNES
+
+# No carga la página:
+sudo systemctl restart httpd
+
+# No abre puerto 8080:
+sudo firewall-cmd --add-port=8080/tcp --permanent
+sudo firewall-cmd --reload
+
+# Error en configuración:
+sudo systemctl status httpd
+
+------------------------------------------------------------
