@@ -1,0 +1,133 @@
+Extra: Script para enviar correos desde la terminal.
+
+=========================================================
+
+nano enviar_correo.sh
+
+>
+#!/bin/bash
+
+# Pedir datos al usuario
+read -p "¿A quién va dirigido el email? (correo destinatario): " destinatario
+read -p "Asunto: " asunto
+echo "Escribe el cuerpo del mensaje. Finaliza con CTRL+D:"
+cuerpo=$(cat)
+
+# Obtener la fecha y hora actual
+fecha_actual=$(date +"%Y-%m-%d %H:%M:%S")
+
+# Crear archivo temporal con el mensaje
+tempfile=$(mktemp)
+echo "$cuerpo" > "$tempfile"
+echo "" >> "$tempfile"
+echo "Enviado el: $fecha_actual" >> "$tempfile"
+
+# Enviar el correo
+mail -s "$asunto" "$destinatario" < "$tempfile"
+
+# Eliminar archivo temporal
+rm "$tempfile"
+
+echo "Correo enviado a $destinatario con asunto '$asunto'"
+
+
+
+chmod +x enviar_correo.sh
+
+
+Extra: Script para enviar correos desde la terminal
+
+=========================================================
+
+# Crear el script
+
+nano enviar_correo.sh
+
+# Dentro del archivo pegar:
+
+#!/bin/bash
+
+# Pedir datos al usuario
+read -p "¿A quién va dirigido el email? (correo destinatario): " destinatario
+read -p "Asunto: " asunto
+
+echo "Escribe el cuerpo del mensaje. Finaliza con CTRL+D:"
+cuerpo=$(cat)
+
+# Obtener fecha y hora actual
+fecha_actual=$(date +"%Y-%m-%d %H:%M:%S")
+
+# Crear archivo temporal
+tempfile=$(mktemp)
+
+# Escribir contenido del mensaje
+echo "$cuerpo" > "$tempfile"
+echo "" >> "$tempfile"
+echo "Enviado el: $fecha_actual" >> "$tempfile"
+
+# Verificar si el comando mail existe
+if ! command -v mail &> /dev/null
+then
+    echo "El comando 'mail' no está instalado. Instalando..."
+    sudo dnf install mailx -y
+fi
+
+# Enviar el correo
+mail -s "$asunto" "$destinatario" < "$tempfile"
+
+# Verificar si se envió correctamente
+if [ $? -eq 0 ]; then
+    echo "Correo enviado correctamente a $destinatario"
+else
+    echo "Error al enviar el correo"
+fi
+
+# Eliminar archivo temporal
+rm "$tempfile"
+
+---------------------------------------------------------
+
+# Dar permisos de ejecución
+
+chmod +x enviar_correo.sh
+
+---------------------------------------------------------
+
+# Ejecutar el script
+
+./enviar_correo.sh
+
+---------------------------------------------------------
+
+# EJEMPLO DE EJECUCIÓN
+
+¿A quién va dirigido el email?:
+os3conadrian@gmail.com
+
+Asunto:
+MambruSeFueALaGuerra
+
+Escribe el cuerpo del mensaje:
+
+Lis Salvador
+Matrícula: 202X-XXXX
+
+(CTRL + D)
+
+---------------------------------------------------------
+
+# RESULTADO ESPERADO
+
+Correo enviado correctamente a os3conadrian@gmail.com
+
+---------------------------------------------------------
+
+# NOTAS IMPORTANTES
+
+# - Debe estar configurado Postfix previamente
+# - Debe funcionar el envío de correo con Gmail
+# - El asunto debe ser EXACTO: MambruSeFueALaGuerra
+# - El correo debe llegar al destinatario
+
+---------------------------------------------------------
+./enviar_correo.sh
